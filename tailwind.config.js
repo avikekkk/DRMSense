@@ -5,23 +5,29 @@ export default {
   theme: {
     extend: {
       colors: {
-        dark: {
-          900: '#000000',
-          800: '#111111',
-          700: '#1a1a1a'
-        }
-      },
-      fontFamily: {
-        sans: ['"Google Sans Flex"', 'system-ui', 'sans-serif'],
-      },
-      keyframes: {
-        'fade-in': {
-          from: { opacity: '0', transform: 'translateY(4px)' },
-          to: { opacity: '1', transform: 'translateY(0)' },
+        surface: {
+          DEFAULT: '#FFFFFF',
+          dark: '#18181B',
+        },
+        border: {
+          DEFAULT: '#E4E4E7',
+          dark: '#27272A',
+        },
+        accent: {
+          DEFAULT: '#0284C7',
+          dark: '#38BDF8',
         },
       },
-      animation: {
-        'fade-in': 'fade-in 0.25s ease-out',
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+      },
+      fontSize: {
+        '2xs': ['0.6875rem', { lineHeight: '1rem' }],
+      },
+      letterSpacing: {
+        tighter: '-0.04em',
+        tight: '-0.02em',
       },
     },
   },

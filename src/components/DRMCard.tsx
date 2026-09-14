@@ -1,33 +1,32 @@
-import { BsShield, BsShieldCheck, BsShieldExclamation, BsShieldLock, BsKey } from 'react-icons/bs';
+import { RiKeyLine, RiShieldCheckLine, RiShieldFlashLine, RiShieldKeyholeLine, RiShieldLine } from 'react-icons/ri';
 import type { IconType } from 'react-icons';
 import type { DRMSystemInfo } from '../types/drm';
 import { Card } from './ui/Card';
 
 const ICONS: Record<string, IconType> = {
-  Shield: BsShield,
-  ShieldCheck: BsShieldCheck,
-  ShieldAlert: BsShieldExclamation,
-  ShieldLock: BsShieldLock,
-  Key: BsKey,
+  Shield: RiShieldLine,
+  ShieldCheck: RiShieldCheckLine,
+  ShieldAlert: RiShieldFlashLine,
+  ShieldLock: RiShieldKeyholeLine,
+  Key: RiKeyLine,
 };
 
-/** Hardware-backed levels deserve visual emphasis — they gate 4K/HDR content. */
 function isHardwareLevel(level: string): boolean {
   return /L1|SL3000|Hardware/i.test(level);
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex justify-between items-baseline gap-3 text-sm">
-      <span className="text-gray-600 dark:text-gray-400 shrink-0">{label}</span>
-      <span className="text-right font-medium text-gray-900 dark:text-white">{children}</span>
+    <div className="flex justify-between items-baseline gap-3 py-1.5 border-b border-border dark:border-border-dark last:border-0">
+      <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{label}</span>
+      <span className="text-right text-xs font-medium text-gray-700 dark:text-gray-300">{children}</span>
     </div>
   );
 }
 
 function Pills({ values, empty }: { values: string[]; empty: string }) {
   if (values.length === 0) {
-    return <span className="text-gray-400 dark:text-gray-500 font-normal">{empty}</span>;
+    return <span className="text-xs text-gray-300 dark:text-zinc-600">{empty}</span>;
   }
 
   return (
@@ -35,7 +34,7 @@ function Pills({ values, empty }: { values: string[]; empty: string }) {
       {values.map((value) => (
         <span
           key={value}
-          className="text-xs bg-gray-100 dark:bg-dark-700 text-gray-700 dark:text-gray-300 px-1.5 py-0.5 rounded font-mono"
+          className="text-2xs font-mono text-gray-500 dark:text-zinc-400"
         >
           {value}
         </span>
@@ -49,24 +48,24 @@ interface DRMCardProps {
 }
 
 export function DRMCard({ system }: DRMCardProps) {
-  const Icon = ICONS[system.icon] ?? BsShield;
+  const Icon = ICONS[system.icon] ?? RiShieldLine;
   const hardware = isHardwareLevel(system.securityLevel);
   const supportedCodecs = system.supportedCodecs.filter((c) => c.supported);
 
   return (
-    <Card className="transition-all hover:shadow-lg">
-      <div className="flex items-center gap-3 mb-4">
-        <Icon className="w-8 h-8 text-green-500 dark:text-green-400" />
+    <Card>
+      <div className="flex items-center gap-2.5 mb-3 pb-3 border-b border-zinc-200 dark:border-zinc-800">
+        <Icon className="w-4 h-4 text-gray-800 dark:text-zinc-100 shrink-0" />
         <div className="min-w-0">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{system.name}</h2>
-          <p className="text-xs text-gray-500 dark:text-gray-400 font-mono truncate">
+          <h2 className="text-sm font-semibold tracking-tight text-gray-900 dark:text-zinc-100">{system.name}</h2>
+          <p className="text-2xs font-mono text-gray-400 dark:text-zinc-500 truncate">
             {system.keySystem}
           </p>
         </div>
       </div>
 
-      <div className="space-y-2.5">
-        <Row label="Security Level">
+      <div>
+        <Row label="Security">
           <span
             className={
               hardware
@@ -90,7 +89,7 @@ export function DRMCard({ system }: DRMCardProps) {
 
         {system.hdcpVersions.length > 0 && (
           <Row label="Max HDCP">
-            <span className="font-mono text-xs">
+            <span className="font-mono text-2xs">
               {system.hdcpVersions[system.hdcpVersions.length - 1]}
             </span>
           </Row>
@@ -107,58 +106,56 @@ export function DRMCard({ system }: DRMCardProps) {
                       ? 'Hardware-accelerated under this key system'
                       : 'Software decode under this key system'
                   }
-                  className="text-xs bg-gray-100 dark:bg-dark-700 text-gray-700 dark:text-gray-300 px-1.5 py-0.5 rounded font-mono"
+                  className="text-2xs font-mono text-gray-500 dark:text-zinc-400"
                 >
                   {codec.name}
-                  {codec.maxResolution ? ` \u2264${codec.maxResolution}` : ''}
-                  {codec.powerEfficient ? ' \u26a1' : ''}
+                  {codec.maxResolution ? ` ≤${codec.maxResolution}` : ''}
+                  {codec.powerEfficient ? ' ⚡' : ''}
                 </span>
               ))}
             </span>
           </Row>
         )}
 
-        <div className="pt-2.5 border-t border-gray-100 dark:border-dark-700 space-y-2.5">
-          <Row label="Persistent License">
-            <span
-              className={
-                system.persistentLicenseSupport
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-gray-400 dark:text-gray-500'
-              }
-            >
-              {system.persistentLicenseSupport ? 'Supported' : 'Not Supported'}
-            </span>
-          </Row>
-          <Row label="Distinctive ID">
-            <span
-              className={
-                system.distinctiveIdentifier
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-gray-400 dark:text-gray-500'
-              }
-            >
-              {system.distinctiveIdentifier ? 'Available' : 'Not Available'}
-            </span>
-          </Row>
-        </div>
+        <Row label="Persistent License">
+          <span
+            className={
+              system.persistentLicenseSupport
+                ? 'text-green-600 dark:text-green-400'
+                : 'text-gray-300 dark:text-zinc-600'
+            }
+          >
+            {system.persistentLicenseSupport ? 'Yes' : 'No'}
+          </span>
+        </Row>
+        <Row label="Distinctive ID">
+          <span
+            className={
+              system.distinctiveIdentifier
+                ? 'text-green-600 dark:text-green-400'
+                : 'text-gray-300 dark:text-zinc-600'
+            }
+          >
+            {system.distinctiveIdentifier ? 'Yes' : 'No'}
+          </span>
+        </Row>
 
         {system.keySystems.length > 1 && (
-          <div className="pt-2.5 border-t border-gray-100 dark:border-dark-700">
-            <p className="text-gray-600 dark:text-gray-400 text-sm mb-1.5">Key Systems</p>
-            <div className="space-y-1">
+          <div className="pt-2 mt-1 border-t border-zinc-200 dark:border-zinc-800">
+            <p className="text-xs text-gray-400 dark:text-zinc-500 mb-1">Key Systems</p>
+            <div className="space-y-0.5">
               {system.keySystems.map((ks) => (
-                <div key={ks.keySystem} className="flex items-center gap-2 text-xs">
+                <div key={ks.keySystem} className="flex items-center gap-2 text-2xs">
                   <span
                     className={
                       ks.supported
                         ? 'text-green-500'
-                        : 'text-gray-300 dark:text-gray-600'
+                        : 'text-gray-200 dark:text-zinc-700'
                     }
                   >
                     {ks.supported ? '✓' : '✗'}
                   </span>
-                  <span className="text-gray-600 dark:text-gray-400">{ks.label}</span>
+                  <span className="font-mono text-gray-500 dark:text-zinc-400">{ks.label}</span>
                 </div>
               ))}
             </div>

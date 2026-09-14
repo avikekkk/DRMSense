@@ -57,23 +57,6 @@ export interface ContainerSupport {
   recording: boolean;
 }
 
-export interface EncodingSupport {
-  name: string;
-  kind: 'video' | 'audio';
-  /** Encodable to a file via MediaRecorder-style recording. */
-  record: boolean;
-  /** Encodable for realtime transport. */
-  webrtc: boolean;
-}
-
-export interface WebCodecsSupport {
-  available: boolean;
-  videoDecode: string[];
-  videoEncode: string[];
-  audioDecode: string[];
-  audioEncode: string[];
-}
-
 export interface HDRCapability {
   name: string;
   supported: boolean;
@@ -90,25 +73,17 @@ export interface DisplayCapabilities {
   hdr: {
     supported: boolean;
     formats: HDRCapability[];
-    /** Metadata formats accepted by decodingInfo, per the MC IDL. */
     metadataTypes: string[];
-    /** Transfer functions accepted by decodingInfo: srgb, pq, hlg. */
     transferFunctions: string[];
   };
   screen: {
     width: number;
     height: number;
-    /**
-     * Bits per colour *component*, from the CSS `color` media feature.
-     * 0 means a monochrome device; null means it could not be determined.
-     */
     bitsPerChannel: number | null;
-    /** Bits per *pixel* from screen.colorDepth — often a fixed 24 regardless of hardware. */
     colorDepth: number;
     pixelDepth: number;
     refreshRate: number | null;
   };
-  /** Max output channels reported by the Web Audio destination node. */
   maxAudioChannels: number | null;
 }
 
@@ -116,8 +91,6 @@ export interface DetailedMediaCapabilities {
   containers: ContainerSupport[];
   videoCodecs: DetailedCodecInfo[];
   audioCodecs: DetailedAudioCodecInfo[];
-  encoding: EncodingSupport[];
-  webCodecs: WebCodecsSupport;
   display: DisplayCapabilities;
 }
 

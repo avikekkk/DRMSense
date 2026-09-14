@@ -1,31 +1,23 @@
+import { useState } from 'react';
 import {
-  BsBattery,
-  BsFilm,
-  BsLayers,
-  BsMusicNoteBeamed,
-  BsSpeedometer2,
-} from 'react-icons/bs';
+  RiArrowDownSLine,
+  RiArrowRightSLine,
+  RiFilmLine,
+  RiMusic2Line,
+} from 'react-icons/ri';
 import type {
   DetailedAudioCodecInfo,
   DetailedCodecInfo,
-  PlaybackModeSupport,
 } from '../../types/drm';
-import { Chip, Section } from './Section';
+import { Section } from './Section';
 
 interface FamilyGroup<T> {
   family: string;
   supported: T[];
   total: number;
-  /** The variant carrying the family's detail probes. */
   lead: T | undefined;
 }
 
-/**
- * Group variants under their family, keeping input order.
- *
- * With ~50 video and ~40 audio codec strings, a flat list is unreadable — and
- * misleading, since eight H.264 levels are one capability, not eight.
- */
 function groupByFamily<T extends { family: string; supported: boolean }>(
   codecs: T[],
 ): FamilyGroup<T>[] {
@@ -44,152 +36,152 @@ function groupByFamily<T extends { family: string; supported: boolean }>(
     }
   }
 
-  return [...groups.values()].filter((g) => g.supported.length > 0);
-}
-
-function ModeChips({ modes }: { modes?: PlaybackModeSupport }) {
-  if (!modes) return null;
-
-  const labels = [
-    modes.file && 'File',
-    modes.mediaSource && 'MSE',
-    modes.webrtc && 'WebRTC',
-  ].filter((l): l is string => typeof l === 'string');
-
-  if (labels.length === 0) return null;
-
-  return <Chip title="Playback modes reported by decodingInfo">{labels.join(' · ')}</Chip>;
+  return [...groups.values()];
 }
 
 function FamilyBlock({
   family,
   count,
-  chips,
   variants,
 }: {
   family: string;
   count: string;
-  chips: React.ReactNode;
   variants: string[];
 }) {
   return (
-    <div className="animate-hover p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700/50">
+    <div className="py-2 border-b border-zinc-200 dark:border-zinc-800 last:border-0">
       <div className="flex justify-between items-baseline gap-2">
-        <span className="text-gray-800 dark:text-gray-200 font-medium text-sm">{family}</span>
-        <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums shrink-0">
+        <span className="text-sm font-medium text-gray-800 dark:text-zinc-200">{family}</span>
+        <span className="text-2xs font-mono text-gray-400 dark:text-zinc-500 tabular-nums shrink-0">
           {count}
         </span>
       </div>
 
-      <div className="flex flex-wrap gap-1.5 items-center mt-1 text-xs text-gray-500 dark:text-gray-400">
-        {chips}
-      </div>
-
-      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 leading-relaxed">
-        {variants.join(' · ')}
-      </p>
+      {variants.length > 0 && (
+        <p className="text-2xs font-mono text-gray-400 dark:text-zinc-500 mt-1">
+          {variants.join(' · ')}
+        </p>
+      )}
     </div>
   );
 }
 
 export function VideoCodecSection({ codecs }: { codecs: DetailedCodecInfo[] }) {
-  const groups = groupByFamily(codecs);
-  const supportedCount = codecs.filter((c) => c.supported).length;
+  const [showUnsupported, setShowUnsupported] = useState(false);
+  const allGroups = groupByFamily(codecs);
+  const supportedGroups = allGroups.filter((g) => g.supported.length > 0);
+  const unsupportedGroups = allGroups.filter((g) => g.supported.length === 0);
 
   return (
     <Section
-      icon={BsFilm}
-      iconClass="text-cyan-500"
+      icon={RiFilmLine}
+      iconClass="text-gray-800 dark:text-zinc-100"
       title="Video Codecs"
-      count={{ supported: supportedCount, total: codecs.length }}
-      emptyMessage="No video codecs supported by this browser."
-      className="space-y-3"
+      emptyMessage="No video codecs supported."
+      className="space-y-0"
     >
-      {groups.map((group) => (
+      {supportedGroups.map((group) => (
         <FamilyBlock
           key={group.family}
           family={group.family}
           count={`${group.supported.length}/${group.total}`}
           variants={group.supported.map((c) => c.name)}
-          chips={
-            <>
-              <ModeChips modes={group.lead?.modes} />
-              {group.lead?.smooth && (
-                <span className="flex items-center" title="Smooth playback likely">
-                  <BsSpeedometer2 className="w-3 h-3 mr-1" /> Smooth
-                </span>
-              )}
-              {group.lead?.powerEfficient && (
-                <span className="flex items-center" title="Power efficient (hardware decoding)">
-                  <BsBattery className="w-3 h-3 mr-1" /> Efficient
-                </span>
-              )}
-              {group.lead?.hasAlphaChannel && (
-                <span className="flex items-center" title="Supports an alpha (transparency) channel">
-                  <BsLayers className="w-3 h-3 mr-1" /> Alpha
-                </span>
-              )}
-              {group.lead?.maxSmoothResolution && (
-                <Chip title="Highest resolution that decodes without dropping frames">
-                  up to {group.lead.maxSmoothResolution}
-                </Chip>
-              )}
-              {group.lead?.maxResolution &&
-                group.lead.maxResolution !== group.lead.maxSmoothResolution && (
-                  <Chip title="Decodes, but not smoothly at this resolution">
-                    {group.lead.maxResolution} (not smooth)
-                  </Chip>
-                )}
-              {group.lead?.hdrMetadataTypes?.map((type) => (
-                <Chip key={type} title="HDR metadata format accepted with this codec">
-                  {type}
-                </Chip>
-              ))}
-            </>
-          }
         />
       ))}
+      {showUnsupported && unsupportedGroups.length > 0 && (
+        <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
+          <span className="text-2xs text-gray-400 dark:text-zinc-500">Unsupported</span>
+          {unsupportedGroups.map((group) => {
+            const unsupportedVariants = codecs
+              .filter((c) => c.family === group.family && !c.supported)
+              .map((c) => c.name);
+            return (
+              <FamilyBlock
+                key={group.family}
+                family={group.family}
+                count={`0/${group.total}`}
+                variants={unsupportedVariants}
+              />
+            );
+          })}
+        </div>
+      )}
+      {unsupportedGroups.length > 0 && (
+        <button
+          onClick={() => setShowUnsupported(!showUnsupported)}
+          className="flex items-center gap-1 text-2xs text-gray-400 dark:text-zinc-500 py-2"
+        >
+          {showUnsupported ? (
+            <>
+              <RiArrowDownSLine className="w-3 h-3" /> Show less
+            </>
+          ) : (
+            <>
+              <RiArrowRightSLine className="w-3 h-3" /> Show more
+            </>
+          )}
+        </button>
+      )}
     </Section>
   );
 }
 
 export function AudioCodecSection({ codecs }: { codecs: DetailedAudioCodecInfo[] }) {
-  const groups = groupByFamily(codecs);
-  const supportedCount = codecs.filter((c) => c.supported).length;
+  const [showUnsupported, setShowUnsupported] = useState(false);
+  const allGroups = groupByFamily(codecs);
+  const supportedGroups = allGroups.filter((g) => g.supported.length > 0);
+  const unsupportedGroups = allGroups.filter((g) => g.supported.length === 0);
 
   return (
     <Section
-      icon={BsMusicNoteBeamed}
-      iconClass="text-pink-500"
+      icon={RiMusic2Line}
+      iconClass="text-gray-800 dark:text-zinc-100"
       title="Audio Codecs"
-      count={{ supported: supportedCount, total: codecs.length }}
-      emptyMessage="No audio codecs supported by this browser."
-      className="space-y-3"
+      emptyMessage="No audio codecs supported."
+      className="space-y-0"
     >
-      {groups.map((group) => {
-        // Stereo is the assumed baseline; only surround layouts are notable.
-        const surround = group.lead?.channelLayouts?.filter((l) => l !== 'Stereo') ?? [];
-
-        return (
-          <FamilyBlock
-            key={group.family}
-            family={group.family}
-            count={`${group.supported.length}/${group.total}`}
-            variants={group.supported.map((c) => c.name)}
-            chips={
-              <>
-                <ModeChips modes={group.lead?.modes} />
-                {surround.map((layout) => (
-                  <Chip key={layout}>{layout}</Chip>
-                ))}
-                {group.lead?.spatialRendering && (
-                  <Chip title="Object-based / spatial audio (Dolby Atmos)">Spatial</Chip>
-                )}
-              </>
-            }
-          />
-        );
-      })}
+      {supportedGroups.map((group) => (
+        <FamilyBlock
+          key={group.family}
+          family={group.family}
+          count={`${group.supported.length}/${group.total}`}
+          variants={group.supported.map((c) => c.name)}
+        />
+      ))}
+      {showUnsupported && unsupportedGroups.length > 0 && (
+        <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
+          <span className="text-2xs text-gray-400 dark:text-zinc-500">Unsupported</span>
+          {unsupportedGroups.map((group) => {
+            const unsupportedVariants = codecs
+              .filter((c) => c.family === group.family && !c.supported)
+              .map((c) => c.name);
+            return (
+              <FamilyBlock
+                key={group.family}
+                family={group.family}
+                count={`0/${group.total}`}
+                variants={unsupportedVariants}
+              />
+            );
+          })}
+        </div>
+      )}
+      {unsupportedGroups.length > 0 && (
+        <button
+          onClick={() => setShowUnsupported(!showUnsupported)}
+          className="flex items-center gap-1 text-2xs text-gray-400 dark:text-zinc-500 py-2"
+        >
+          {showUnsupported ? (
+            <>
+              <RiArrowDownSLine className="w-3 h-3" /> Show less
+            </>
+          ) : (
+            <>
+              <RiArrowRightSLine className="w-3 h-3" /> Show more
+            </>
+          )}
+        </button>
+      )}
     </Section>
   );
 }

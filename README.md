@@ -24,9 +24,7 @@ Uses the [Media Capabilities API](https://www.w3.org/TR/media-capabilities/) alo
 - **Audio Codecs**: 41 codec strings across 12 families — AAC (LC, HE-AAC v1/v2, LD, ELD, xHE-AAC), Dolby (AC-3, E-AC-3, AC-4, TrueHD), DTS (Core, Express, HD-HR, HD-MA, DTS:X), MPEG-H 3D Audio, Opus, Vorbis, FLAC, ALAC, MP3/MP2, PCM, IAMF — with surround layouts and spatial audio (Atmos)
 - **HDR Capabilities**: Dolby Vision, HDR10, HLG, plus HDR metadata formats and transfer functions
 - **Resolution ladder**: highest resolution each codec decodes, and highest it decodes *smoothly* (480p → 8K)
-- **Encoding**: recording and realtime encode support
-- **WebCodecs**: decode and encode, reported separately since it is a different code path from `<video>`
-- **Display & Output**: colour gamut, colour depth, refresh rate, max audio channels
+
 
 ### Modern Experience
 - **Premium UI**: Clean, glassmorphic design with smooth micro-animations.

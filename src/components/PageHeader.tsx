@@ -1,17 +1,16 @@
-import { BsShield } from 'react-icons/bs';
+import { RiShieldLine } from 'react-icons/ri';
 
 export function PageHeader() {
   return (
-    <div className="text-center mb-12">
-      <div className="flex items-center justify-center gap-3 mb-4">
-        <BsShield className="w-12 h-12 text-blue-600 dark:text-blue-400" />
-        <h1 className="text-5xl font-bold text-gray-900 dark:text-white tracking-tight">
+    <div className="mb-8">
+      <div className="flex items-center gap-3 mb-2">
+        <RiShieldLine className="w-6 h-6 text-gray-800 dark:text-zinc-100" />
+        <h1 className="text-xl font-bold tracking-tighter text-gray-900 dark:text-zinc-100">
           DRMSense
         </h1>
       </div>
-      <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-xl">
-        Check your browser's Digital Rights Management (DRM) capabilities and extensive media
-        codec support.
+      <p className="text-sm text-gray-500 dark:text-zinc-400 max-w-lg leading-relaxed">
+        Browser diagnostics for DRM systems and media codec support.
       </p>
     </div>
   );

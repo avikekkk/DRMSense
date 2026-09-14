@@ -1,41 +1,25 @@
-import { BsDisplay } from 'react-icons/bs';
+import { RiComputerLine } from 'react-icons/ri';
 import type { SystemInfo } from '../types/drm';
-import { Card } from './ui/Card';
 
 interface SystemInfoCardProps {
   info: SystemInfo;
 }
 
 export function SystemInfoCard({ info }: SystemInfoCardProps) {
-  const fields = [
-    { label: 'Operating System', value: info.os },
-    { label: 'OS Version', value: info.osVersion },
-    { label: 'Browser', value: info.browser },
-    { label: 'Version', value: info.version },
-  ];
+  const os = info.osVersion !== 'Unknown' ? `${info.os} ${info.osVersion}` : info.os;
+  const browser = info.version !== 'Unknown' ? `${info.browser} ${info.version}` : info.browser;
 
   return (
-    <Card className="col-span-full mb-6">
-      <div className="flex items-center gap-3 mb-4">
-        <BsDisplay className="w-8 h-8 text-blue-500 dark:text-blue-400" />
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          System Information
-        </h2>
-        {info.mobile && (
-          <span className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full">
-            Mobile
-          </span>
-        )}
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {fields.map((field) => (
-          <div key={field.label}>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">{field.label}</p>
-            <p className="font-medium text-gray-900 dark:text-white">{field.value}</p>
-          </div>
-        ))}
-      </div>
-    </Card>
+    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-800">
+      <RiComputerLine className="w-4 h-4 text-gray-400 dark:text-zinc-500 shrink-0" />
+      <span className="text-sm font-mono text-gray-600 dark:text-zinc-300">
+        {os} · {browser}
+      </span>
+      {info.mobile && (
+        <span className="text-2xs font-mono text-accent dark:text-accent-dark border border-accent/30 dark:border-accent-dark/30 px-1.5 py-0.5">
+          mobile
+        </span>
+      )}
+    </div>
   );
 }

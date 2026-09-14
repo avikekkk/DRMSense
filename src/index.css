@@ -1,19 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  body {
-    font-family: 'Google Sans Flex', system-ui, -apple-system, sans-serif;
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-}
 
-@layer utilities {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
 
-
-  .animate-hover {
-    @apply transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg;
+  *, *::before, *::after {
+    border-radius: 0 !important;
   }
 }

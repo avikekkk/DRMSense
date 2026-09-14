@@ -3,7 +3,6 @@ import type {
   DetailedCodecInfo,
   DetailedMediaCapabilities,
   DisplayCapabilities,
-  EncodingSupport,
   HDRCapability,
   PlaybackModeSupport,
 } from '../types/drm';
@@ -11,7 +10,6 @@ import {
   AUDIO_CODECS_TO_TEST,
   AUDIO_PROBE_PARAMS,
   CHANNEL_LAYOUTS,
-  ENCODING_CODECS,
   HDR_METADATA_TYPES,
   HDR_PROBES,
   RESOLUTION_LADDER,
@@ -21,10 +19,8 @@ import {
   type AudioCodecProbe,
   type VideoCodecProbe,
 } from '../constants/codecs';
-import { probeDecodingInfo, probeEncodingInfo, type DecodingConfig } from './probe';
+import { probeDecodingInfo, type DecodingConfig } from './probe';
 import { detectContainers } from './containers';
-import { detectWebCodecs } from './webcodecs';
-
 /** Drop the nulls a "supported ? value : null" map leaves behind. */
 function compact<T>(values: (T | null)[]): T[] {
   return values.filter((v): v is T => v !== null);
@@ -196,24 +192,6 @@ async function audioFamilyDetail(
   };
 }
 
-async function detectEncoding(): Promise<EncodingSupport[]> {
-  return Promise.all(
-    ENCODING_CODECS.map(async ({ name, mimeType, kind }) => {
-      const track =
-        kind === 'video'
-          ? { video: { contentType: mimeType, ...VIDEO_PROBE_PARAMS } }
-          : { audio: { contentType: mimeType, ...AUDIO_PROBE_PARAMS } };
-
-      const [record, webrtc] = await Promise.all([
-        probeEncodingInfo({ type: 'record', ...track }, `${name} record`),
-        probeEncodingInfo({ type: 'webrtc', ...track }, `${name} webrtc`),
-      ]);
-
-      return { name, kind, record, webrtc };
-    }),
-  );
-}
-
 /**
  * Bits per colour component, via the CSS `color` media feature.
  *
@@ -264,7 +242,7 @@ function detectMaxAudioChannels(): number | null {
   }
 }
 
-export function detectDisplayCapabilities(): DisplayCapabilities {
+function detectDisplayCapabilities(): DisplayCapabilities {
   const caps: DisplayCapabilities = {
     colorGamut: { sRGB: false, p3: false, rec2020: false },
     hdr: { supported: false, formats: [], metadataTypes: [], transferFunctions: [] },
@@ -389,21 +367,16 @@ export async function detectHDRSupport(): Promise<HDRCapability[]> {
 
 export async function detectMediaCapabilities(): Promise<DetailedMediaCapabilities> {
   const display = detectDisplayCapabilities();
+  const containers = detectContainers();
 
-  const [hdrFormats, metadataTypes, transferFunctions, containers, webCodecs, encoding] =
+  const [hdrFormats, metadataTypes, transferFunctions, videoCodecs, audioCodecs] =
     await Promise.all([
       detectHDRSupport(),
       detectHDRMetadataTypes(),
       detectTransferFunctions(),
-      Promise.resolve(detectContainers()),
-      detectWebCodecs(),
-      detectEncoding(),
+      Promise.all(VIDEO_CODECS_TO_TEST.map(probeVideoBase)),
+      Promise.all(AUDIO_CODECS_TO_TEST.map(probeAudioBase)),
     ]);
-
-  const [videoCodecs, audioCodecs] = await Promise.all([
-    Promise.all(VIDEO_CODECS_TO_TEST.map(probeVideoBase)),
-    Promise.all(AUDIO_CODECS_TO_TEST.map(probeAudioBase)),
-  ]);
 
   await Promise.all([
     enrichByFamily(videoCodecs, videoFamilyDetail),
@@ -414,8 +387,6 @@ export async function detectMediaCapabilities(): Promise<DetailedMediaCapabiliti
     containers,
     videoCodecs,
     audioCodecs,
-    encoding,
-    webCodecs,
     display: {
       ...display,
       hdr: { ...display.hdr, formats: hdrFormats, metadataTypes, transferFunctions },

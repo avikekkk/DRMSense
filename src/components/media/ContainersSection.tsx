@@ -56,7 +56,7 @@ export function ContainersSection({ containers }: ContainersSectionProps) {
             return (
               <tr
                 key={container.name}
-                className="animate-hover hover:bg-gray-50 dark:hover:bg-dark-700/50"
+                className="p-2"
               >
                 <td className="py-1.5">
                   <span className="text-gray-700 dark:text-gray-300 font-medium">

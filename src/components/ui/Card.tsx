@@ -5,11 +5,10 @@ interface CardProps {
   className?: string;
 }
 
-/** Shared panel shell used by every card on the page. */
 export function Card({ children, className = '' }: CardProps) {
   return (
     <div
-      className={`bg-white dark:bg-dark-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-dark-700 ${className}`}
+      className={`bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-5 ${className}`}
     >
       {children}
     </div>

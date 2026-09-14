@@ -14,8 +14,8 @@ import { ThemeToggle } from './components/ThemeToggle';
 type TabId = 'drm' | 'media';
 
 const TABS: readonly Tab<TabId>[] = [
-  { id: 'drm', label: 'DRM Info' },
-  { id: 'media', label: 'Media Info' },
+  { id: 'drm', label: 'DRM' },
+  { id: 'media', label: 'Codecs' },
 ];
 
 function App() {
@@ -30,11 +30,11 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-900 transition-colors font-sans">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 font-sans text-gray-900 dark:text-zinc-100">
       <ThemeToggle />
       <ExportButton onExport={handleExport} />
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-[1100px] mx-auto px-6 py-10">
         <PageHeader />
 
         {loading ? (
@@ -46,13 +46,11 @@ function App() {
 
             <div className="min-h-[400px]">
               {activeTab === 'media' && mediaCapabilities && (
-                <div className="animate-fade-in">
-                  <MediaCapabilitiesCard capabilities={mediaCapabilities} />
-                </div>
+                <MediaCapabilitiesCard capabilities={mediaCapabilities} />
               )}
 
               {activeTab === 'drm' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {supportedDrmSystems.length > 0 ? (
                     supportedDrmSystems.map((system) => (
                       <DRMCard key={system.name} system={system} />
@@ -66,15 +64,8 @@ function App() {
           </>
         )}
 
-        <div className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>
-            Note: This tool uses the Encrypted Media Extensions (EME) and Media Capabilities
-            APIs.
-          </p>
-          <p>
-            Results may vary depending on your browser, operating system, and hardware
-            configuration.
-          </p>
+        <div className="mt-12 pt-4 border-t border-zinc-200 dark:border-zinc-800 text-xs text-gray-400 dark:text-zinc-500 leading-relaxed">
+          Uses EME and Media Capabilities APIs. Results vary by browser, OS, and hardware.
         </div>
       </div>
     </div>
