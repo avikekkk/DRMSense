@@ -18,3 +18,22 @@
     border-radius: 0 !important;
   }
 }
+
+@layer components {
+  /* "Decodes, but drops frames" — a half-filled rung on the resolution ladder. */
+  .rung-hatch {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgb(24 24 27 / 0.22) 0 2px,
+      transparent 2px 5px
+    );
+  }
+
+  .dark .rung-hatch {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgb(244 244 245 / 0.28) 0 2px,
+      transparent 2px 5px
+    );
+  }
+}
